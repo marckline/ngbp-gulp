@@ -1,6 +1,6 @@
 angular.module( 'ngBoilerplate', [
   'templates-app',
-  'templates-common',
+  // 'templates-common',
   'ngBoilerplate.home',
   'ngBoilerplate.about',
   'ui.router'
