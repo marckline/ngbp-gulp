@@ -1,0 +1,27 @@
+<div class="row">
+    <h1 class="page-header">
+        Details
+        <small>{{name}}</small>
+    </h1>
+    <a ui-sref="myBooks" ng-click="saveBook(book)">save to my books <i class="fa fa-plus-circle"></i></a>
+    <p>{{book.volumeInfo.title}}</p>
+    <img ng-cloak ng-src="{{book.volumeInfo.imageLinks.thumbnail}}">
+    <p>{{book.volumeInfo.description}}</p>
+
+
+    <div class="dropdown btn-group">
+        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+            Options...
+            <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+            <li>
+                <a> some choice</a>
+            </li>
+            <li>
+                <a> some other choice</a>
+            </li>
+        </ul>
+    </div>
+</div>
+

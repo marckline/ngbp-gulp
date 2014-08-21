@@ -19,7 +19,6 @@ var gulp                  = require('gulp'),
 	conventionalChangelog = require('conventional-changelog'),
 	bump                  = require('gulp-bump'),
 	ngAnnotate            = require('gulp-ng-annotate'),
-
 	config                = require('./build.config.js'),
 	pkg                   = require('./package.json'),
 	streamqueue  		  = require('streamqueue')
@@ -44,13 +43,28 @@ gulp.task('copy', function() {
 	return merge(sources);
 });
 
+
+gulp.task('injectify', ['prod'], function () {
+
+	var target = gulp.src('./build/index.html'),
+
+		files = [].concat(
+			config.vendor_files.css,
+			'assets/' + pkg.name + '-' + pkg.version + '.css',
+			'js/app.js',
+			'templates-app.js'
+		),
+
+		sources = gulp.src(files, {read: false, cwd: config.prod_dir});
+
+	return target.pipe(inject(sources))
+		.pipe(gulp.dest(config.prod_dir));
+
+});
+
+
 gulp.task('prod', function() {
 
-	/*
-	 TODO -- create optimized index.html file with this:
-	 <script src="/js/app.js"></script>
-	 <script src="/templates-app.js"></script>
-	*/
 
 	var paths = {
 		scriptsNoTest: ['src/**/*.js', '!src/**/*.spec.js'],
@@ -59,7 +73,9 @@ gulp.task('prod', function() {
 		templates: 'build/templates-app.js'
 	};
 
-	var streamQ = streamqueue({ objectMode: true },
+	//Concat into prod/js/app.js
+
+	var concats = streamqueue({ objectMode: true },
 		gulp.src(config.vendor_files.js),
 		gulp.src(paths.scriptsNoTest)
 	)
@@ -72,18 +88,17 @@ gulp.task('prod', function() {
 				.pipe(gulp.dest(config.prod_dir + '/assets')),
 			gulp.src(paths.templates)
 				.pipe(gulp.dest(config.prod_dir)),
-			gulp.src(paths.index)
-				.pipe(gulp.dest(config.prod_dir))
+//			gulp.src(paths.index)
+//				.pipe(gulp.dest(config.prod_dir))
 		];
 
 		return merge(sources);
 	};
 
 	return {
-		streamQ : streamQ,
+		concats : concats,
 		simpleCopy: simpleCopy()
 	};
-
 });
 
 gulp.task('less', function() {
@@ -141,7 +156,7 @@ var indexTask = function() {
 			'assets/' + pkg.name + '-' + pkg.version + '.css'
 		),
 
-		sources = gulp.src(files, {read: false, cwd: config.build_dir});
+		sources = gulp.src(files, {read: false, cwd: config.build_dir, addRootSlash: false});
 
 	return target.pipe(inject(sources))
 		.pipe(gulp.dest(config.build_dir));
