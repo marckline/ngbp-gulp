@@ -1,10 +1,10 @@
 .jumbotron {
   margin: 40px 0 80px 0;
   text-align: center;
-  background: green;
+  background: beige;
 
   @include MQ(medium){
-	background: red;
+	background: $gray;
   }
 
   h1 {
