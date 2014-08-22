@@ -1,30 +1,29 @@
-var gulp                  = require('gulp'),
-	concat                = require('gulp-concat'),
-	uglify                = require('gulp-uglify'),
-	less                  = require('gulp-less'),
-	rename                = require('gulp-rename'),
-	del                   = require('del'),
-	livereload            = require('gulp-livereload'),
-	inject                = require("gulp-inject"),
-	html2js               = require('gulp-html2js'),
-	jshint                = require('gulp-jshint'),
-	stylish               = require('jshint-stylish'),
-	debug                 = require('gulp-debug'),
-	svgstore              = require('gulp-svgstore'),
-	merge                 = require('merge-stream'),
-	watch                 = require('gulp-watch'),
-	changed               = require('gulp-changed'),
-	header                = require('gulp-header'),
-	fs                    = require('fs'),
-	conventionalChangelog = require('conventional-changelog'),
-	bump                  = require('gulp-bump'),
-	ngAnnotate            = require('gulp-ng-annotate'),
-	config                = require('./build.config.js'),
-	pkg                   = require('./package.json'),
-	streamqueue  		  = require('streamqueue'),
-	sass 				  = require('gulp-ruby-sass')
+var gulp                  	= require('gulp'),
+	concat                	= require('gulp-concat'),
+	uglify                	= require('gulp-uglify'),
+	less                  	= require('gulp-less'),
+	rename                	= require('gulp-rename'),
+	del                   	= require('del'),
+	livereload            	= require('gulp-livereload'),
+	inject                	= require("gulp-inject"),
+	html2js               	= require('gulp-html2js'),
+	jshint                	= require('gulp-jshint'),
+	stylish               	= require('jshint-stylish'),
+	debug                 	= require('gulp-debug'),
+	svgstore              	= require('gulp-svgstore'),
+	merge                 	= require('merge-stream'),
+	watch                 	= require('gulp-watch'),
+	changed               	= require('gulp-changed'),
+	header                	= require('gulp-header'),
+	fs                    	= require('fs'),
+	conventionalChangelog 	= require('conventional-changelog'),
+	bump                  	= require('gulp-bump'),
+	ngAnnotate            	= require('gulp-ng-annotate'),
+	config                	= require('./build.config.js'),
+	pkg                   	= require('./package.json'),
+	streamqueue  		  	= require('streamqueue'),
+	sass 				  	= require('gulp-ruby-sass')
 	;
-
 
 gulp.task('sass', function () {
 	return gulp.src(config.app_files.scss)
@@ -62,7 +61,7 @@ gulp.task('injectify', ['prod'], function () {
 
 		files = [].concat(
 			config.vendor_files.css,
-			'assets/' + pkg.name + '-' + pkg.version + '.app.css',
+				'assets/' + pkg.name + '-' + pkg.version + '.app.css',
 			'js/app.js',
 			'templates-app.js'
 		),
@@ -86,14 +85,22 @@ gulp.task('prod', function() {
 
 	//Concat into prod/js/app.js
 
-	var concats = streamqueue({ objectMode: true },
+	var concats = streamqueue(
+		{objectMode: true},
 		gulp.src(config.vendor_files.js),
 		gulp.src(paths.scriptsNoTest)
 	)
 		.pipe(concat('app.js'))
+		.pipe(ngAnnotate({
+			remove: false,
+			add: false,
+			single_quotes: true
+		}))
 		.pipe(gulp.dest(config.prod_dir + '/js'));
 
-	var simpleCopy = function(){
+	//Copy assets
+
+	var simpleCopy = (function(){
 		var sources = [
 			gulp.src(paths.assets)
 				.pipe(gulp.dest(config.prod_dir + '/assets')),
@@ -102,11 +109,11 @@ gulp.task('prod', function() {
 		];
 
 		return merge(sources);
-	};
+	})();
 
 	return {
 		concats : concats,
-		simpleCopy: simpleCopy()
+		simpleCopy: simpleCopy
 	};
 });
 
@@ -162,7 +169,7 @@ var indexTask = function() {
 			config.vendor_files.css,
 			'templates-common.js',
 			'templates-app.js',
-			'assets/' + pkg.name + '-' + pkg.version + '.css'
+				'assets/' + pkg.name + '-' + pkg.version + '.css'
 		),
 
 		sources = gulp.src(files, {read: false, cwd: config.build_dir, addRootSlash: false});
