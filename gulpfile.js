@@ -21,9 +21,21 @@ var gulp                  = require('gulp'),
 	ngAnnotate            = require('gulp-ng-annotate'),
 	config                = require('./build.config.js'),
 	pkg                   = require('./package.json'),
-	streamqueue  		  = require('streamqueue')
+	streamqueue  		  = require('streamqueue'),
+	sass 				  = require('gulp-ruby-sass')
 	;
 
+
+gulp.task('sass', function () {
+	return gulp.src(config.app_files.scss)
+		//.pipe(changed(config.build_dir + '/assets', {extension: '.css'}))
+		.pipe(sass({noCache: true}))
+		.on('error', function (err) { console.log(err.message); })
+		.pipe(rename(function(path){
+			path.basename = pkg.name + '-' + pkg.version;
+		}))
+		.pipe(gulp.dest(config.build_dir + '/assets'));
+});
 
 gulp.task('copy', function() {
 	var sources = [
@@ -50,7 +62,7 @@ gulp.task('injectify', ['prod'], function () {
 
 		files = [].concat(
 			config.vendor_files.css,
-			'assets/' + pkg.name + '-' + pkg.version + '.css',
+			'assets/' + pkg.name + '-' + pkg.version + '.app.css',
 			'js/app.js',
 			'templates-app.js'
 		),
@@ -64,7 +76,6 @@ gulp.task('injectify', ['prod'], function () {
 
 
 gulp.task('prod', function() {
-
 
 	var paths = {
 		scriptsNoTest: ['src/**/*.js', '!src/**/*.spec.js'],
@@ -87,9 +98,7 @@ gulp.task('prod', function() {
 			gulp.src(paths.assets)
 				.pipe(gulp.dest(config.prod_dir + '/assets')),
 			gulp.src(paths.templates)
-				.pipe(gulp.dest(config.prod_dir)),
-//			gulp.src(paths.index)
-//				.pipe(gulp.dest(config.prod_dir))
+				.pipe(gulp.dest(config.prod_dir))
 		];
 
 		return merge(sources);
@@ -162,11 +171,11 @@ var indexTask = function() {
 		.pipe(gulp.dest(config.build_dir));
 };
 
-gulp.task('index', ['less', 'copy', 'html2js'], function() {
+gulp.task('index', ['sass', 'copy', 'html2js'], function() {
 	return indexTask();
 });
 
-gulp.task('watch-index', function() {
+gulp.task('watch-index', ['sass'], function() {
 	return indexTask();
 });
 
@@ -197,7 +206,7 @@ gulp.task('livereload', ['svgstore'], function() {
 });
 
 gulp.task('watch', ['svgstore'], function() {
-	gulp.watch(['**/*.less'], ['less']);
+	gulp.watch(['**/*.scss'], ['sass']);
 	gulp.watch(['src/**/*.js'], [
 		//'jshint',
 		'copy'
