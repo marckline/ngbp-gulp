@@ -57,6 +57,9 @@
     "karma-jasmine": "^0.1.5",
     "merge-stream": "^0.1.5",
     "run-sequence": "^0.3.6",
-    "gulp-ruby-sass": "~0.7.1"
+    "gulp-ruby-sass": "~0.7.1",
+    "http": "0.0.0",
+    "gulp-util": "~3.0.0",
+    "ecstatic": "~0.5.4"
   }
 }

@@ -22,12 +22,14 @@ var gulp                  	= require('gulp'),
 	config                	= require('./build.config.js'),
 	pkg                   	= require('./package.json'),
 	streamqueue  		  	= require('streamqueue'),
-	sass 				  	= require('gulp-ruby-sass')
+	sass 				  	= require('gulp-ruby-sass'),
+	gutil 					= require('gulp-util'),
+	http 					= require('http'),
+	ecstatic		 		= require('ecstatic')
 	;
 
 gulp.task('sass', function () {
 	return gulp.src(config.app_files.scss)
-		//.pipe(changed(config.build_dir + '/assets', {extension: '.css'}))
 		.pipe(sass({noCache: true}))
 		.on('error', function (err) { console.log(err.message); })
 		.pipe(rename(function(path){
@@ -58,19 +60,16 @@ gulp.task('copy', function() {
 gulp.task('injectify', ['prod'], function () {
 
 	var target = gulp.src('./build/index.html'),
-
 		files = [].concat(
 			config.vendor_files.css,
 				'assets/' + pkg.name + '-' + pkg.version + '.app.css',
 			'js/app.js',
 			'templates-app.js'
 		),
-
 		sources = gulp.src(files, {read: false, cwd: config.prod_dir});
 
 	return target.pipe(inject(sources))
 		.pipe(gulp.dest(config.prod_dir));
-
 });
 
 
@@ -84,7 +83,6 @@ gulp.task('prod', function() {
 	};
 
 	//Concat into prod/js/app.js
-
 	var concats = streamqueue(
 		{objectMode: true},
 		gulp.src(config.vendor_files.js),
@@ -99,7 +97,6 @@ gulp.task('prod', function() {
 		.pipe(gulp.dest(config.prod_dir + '/js'));
 
 	//Copy assets
-
 	var simpleCopy = (function(){
 		var sources = [
 			gulp.src(paths.assets)
@@ -107,7 +104,6 @@ gulp.task('prod', function() {
 			gulp.src(paths.templates)
 				.pipe(gulp.dest(config.prod_dir))
 		];
-
 		return merge(sources);
 	})();
 
@@ -223,8 +219,14 @@ gulp.task('watch', ['svgstore'], function() {
 	gulp.watch('src/assets/svg/*.svg', ['svgstore']);
 });
 
+gulp.task('server', function() {
+	http.createServer(ecstatic({root: __dirname + '/build'})).listen(8080);
+	gutil.log(gutil.colors.blue('HTTP server listening on port 8080'));
+});
+
 gulp.task('default', [
 	//'jshint',
+	'server',
 	'watch',
 	'livereload'
 ]);
