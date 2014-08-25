@@ -36,7 +36,7 @@ around: [Twitter Bootstrap](http://getbootstrap.com),
 [Angular UI](http://angular-ui.github.io),
 [Angular Bootstrap](http://angular-ui.github.io/bootstrap),
 [Font Awesome](http://fortawesome.github.com/Font-Awesome), and
-[LESS](http://lesscss.org). Lastly, it contains a sophisticated
+[SASS](http://sass-lang.com). Lastly, it contains a sophisticated
 [Gulp](http://gulpjs.org)-based build system to ensure maximum productivity.
 All you have to do is clone it and start coding!
 
@@ -56,8 +56,8 @@ ng-boilerplate/
   |  |  |- <static files>
   |  |- common/
   |  |  |- <reusable code>
-  |  |- less/
-  |  |  |- main.less
+  |  |- sass/
+  |  |  |- main.scss
   |- vendor/
   |  |- angular-bootstrap/
   |  |- bootstrap/
